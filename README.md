@@ -1,26 +1,19 @@
-# `Turborepo` Vite starter
-
-This is an official starter Turborepo.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest -e with-vite
-```
+# Storacha Image Service
 
 # Motiviations
 
-Combine best of both world. 
+Often we need performant and flexible image service, from avatar to placeholders.
+
+Applying Generative AI is great but we need cost effective storage with fast (cached) retrieval
+
+For best of both worlds, this is a micro CMS to store asasets on filecoin (via storacha) and welcome end-user to contribute in a decentralized way 
+
+This is a project to demo
+- storacha's UCAN supporting [Delegated upload flow](https://docs.storacha.network/concepts/architecture-options/#delegated)
+- Fast retrieval of filecoin 
 
 
-With Gen AI, welcome user 
-
-cost effective storage with fast (cached) retrieval
-
-
-This is a demo project , storacha
+and I find the use case actually useful!
 
 ## Architecture
 - Delegated approach
@@ -29,16 +22,20 @@ This is a demo project , storacha
   - image showcase
   - upload page
 
+## Demo projects
 
 ### HttpCat
 - Demo where static contnet is stored under content 
 
-## Placeholder services
+
+## Reference use cases
+
+### Placeholder services
 - https://dummyimage.com/
 - https://placecats.com/
 - https://doodleipsum.com/
 
-## Avatar
+### Avatar
 - Avatar, Status Code, Tokens
 
 
