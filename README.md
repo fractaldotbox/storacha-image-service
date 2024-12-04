@@ -10,24 +10,35 @@ Run the following command:
 npx create-turbo@latest -e with-vite
 ```
 
-## What's inside?
+# Motiviations
 
-This Turborepo includes the following packages and apps:
+Combine best of both world. 
 
-### Apps and Packages
 
-- `docs`: a vanilla [vite](https://vitejs.dev) ts app
-- `web`: another vanilla [vite](https://vitejs.dev) ts app
-- `@repo/ui`: a stub component & utility library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: shared `eslint` configurations
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+With Gen AI, welcome user 
 
-Each package and app is 100% [TypeScript](https://www.typescriptlang.org/).
+cost effective storage with fast (cached) retrieval
 
-### Utilities
 
-This Turborepo has some additional tools already setup for you:
+This is a demo project , storacha
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+## Architecture
+- Delegated approach
+
+- Astro (5.0) to export a static sites, consist of
+  - image showcase
+  - upload page
+
+
+### HttpCat
+- Demo where static contnet is stored under content 
+
+## Placeholder services
+- https://dummyimage.com/
+- https://placecats.com/
+- https://doodleipsum.com/
+
+## Avatar
+- Avatar, Status Code, Tokens
+
+

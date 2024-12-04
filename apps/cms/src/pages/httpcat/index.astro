@@ -1,0 +1,32 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
+
+
+const httpcats = await getCollection('httpcat');
+
+---
+
+<Layout>
+    <div class="container">
+        <h2 class="font-bold text-2xl">
+            HTTP Cat
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
+                <a href={`/httpcat/${data.id}`}>
+                    <Card className="bg-white p-4 rounded shadow">
+                    <CardHeader>
+                        <CardTitle className="text-xl font-semibold mb-2">{data.id}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <img src={data.imgSrc} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
+                    </CardContent>
+                </Card>
+                </a>
+            ))}
+        </div>
+    </div>
+</Layout>

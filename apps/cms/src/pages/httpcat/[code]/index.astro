@@ -1,0 +1,48 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { getEntry, getCollection } from 'astro:content';
+
+
+
+
+export async function getStaticPaths() {
+  const httpcats = await getCollection('httpcat');
+  
+  return httpcats.map(({data}) => ({
+        params: {
+          code: data.id
+        }
+    }));
+  
+}
+
+const { code }  = Astro.params;
+
+
+
+const httpcat = await getEntry('httpcat', code);
+
+const { data } = httpcat;
+
+---
+
+<Layout>
+    <div class="container text-center">
+        
+        <h2 class="text-center text-3xl font-bold mb-4">{data.id}</h2>
+        
+        <div class="text-center m-auto p-10">
+            <img src={data.imgSrc} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
+            <div>
+                {data.description}
+            </div>
+        </div>
+         
+        <hr />
+        <div class="mt-10">
+            <h2 class="text-2xl">
+                Upload your own HTTP Cat
+            </h2>
+        </div>
+    </div>
+</Layout>
