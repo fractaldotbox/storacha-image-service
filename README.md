@@ -15,12 +15,24 @@ This is a project to demo
 
 and I find the use case actually useful!
 
+
+## Deployment targets
+- Cloudflare pages
+  - Opt for wrangler as we want to incorp multiple projects in this repo
+  - use env variables on .env for auth
+  - `env-cmd pnpm --filter cms deploy`
+- Fleek
+
 ## Architecture
 - Delegated approach
 
 - Astro (5.0) to export a static sites, consist of
   - image showcase
   - upload page
+
+- use w3ui/react in single component for now and separate static vs upload page (auth requires)
+- switch to jotai for client state
+  - https://docs.astro.build/en/recipes/sharing-state-islands/
 
 ## Demo projects
 

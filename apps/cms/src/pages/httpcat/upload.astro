@@ -1,0 +1,21 @@
+---
+import StorachaProvider from "@/components/StorachaProvider";
+import Layout from "@/layouts/Layout.astro";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Provider } from "@w3ui/react";
+import { UploadDashboard } from "@/components/UploadDashboard";
+
+---
+
+
+<Layout>
+    <UploadDashboard client:load/>
+</Layout>
