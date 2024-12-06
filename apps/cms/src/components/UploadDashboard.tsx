@@ -7,37 +7,59 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Authenticator, Provider, useW3 } from "@w3ui/react";
+import { Authenticator, Client, Provider, useW3 } from "@w3ui/react";
 import StorachaAuth from "./StorachaAuth";
 import StorachaProvider from "./StorachaProvider";
-import { useEffect } from "react";
-import { Delegation, extract } from "@web3-storage/w3up-client/delegation";
+import { useEffect, useState } from "react";
+import { Delegation, extract, isDelegation } from "@web3-storage/w3up-client/delegation";
+import { UploadForm } from "./ui/geist/UploadForm";
 
 
+const requestDelegation = ({ client }: {
+    client: Client
+}) => {
+
+    return fetch('/httpcat/api/auth')
+        .then(response => response.arrayBuffer())
+        .then(async arrayBuffer => {
+            const delegation = await extract(new Uint8Array(arrayBuffer))
+            console.log(delegation.ok)
+            if (!delegation.ok) {
+                throw new Error('Failed to extract delegation', { cause: delegation.error })
+            }
+
+
+            return delegation;
+        })
+}
 
 
 export const useDelegateAccount = () => {
 
-    // todo consider query
+    const [{ client, accounts }] = useW3();
+
+    const [isDelegated, setIsDelegated] = useState(false);
 
     useEffect(() => {
         (async () => {
-            fetch('/httpcat/api/auth')
-                .then(response => response.arrayBuffer())
-                .then(async arrayBuffer => {
-                    const delegation = await extract(new Uint8Array(arrayBuffer))
-                    console.log(delegation)
-                    if (!delegation.ok) {
-                        throw new Error('Failed to extract delegation', { cause: delegation.error })
-                    }
-                })
 
+            if (!client) {
+                return;
+            }
 
+            const delegation = await requestDelegation({ client });
+
+            const space = await client.addSpace(delegation.ok)
+            client.setCurrentSpace(space.did())
+
+            setIsDelegated(true);
 
         })();
-    }, [])
-    // request api
+    }, [client, isDelegated]);
 
+    return {
+        isDelegated
+    }
 
 
 }
@@ -46,8 +68,23 @@ export const useDelegateAccount = () => {
 export const UploadControls = () => {
     const [{ spaces, client, accounts }] = useW3();
 
-    useDelegateAccount();
+    const { isDelegated } = useDelegateAccount();
 
+
+    const args = {
+        isText: false,
+        uploadFile: async ({ file, uploadProgressCallback }: FileParams<File>) => {
+            const { uploadFile } = await initStorachaClient({
+                keyString: STORACHA_KEY,
+                proofString: STORACHA_PROOF!,
+            });
+
+            const link = await uploadFile({ file, uploadProgressCallback });
+
+            createToast({ cid: link.toString(), name: "" });
+        },
+    }
+    console.log('isDelegated', isDelegated)
     return (
         <div>
             <div className="flex flex-col gap-2">
@@ -72,8 +109,6 @@ export const UploadControls = () => {
                             </CardDescription>
                         </CardHeader>
                     </Card>
-
-
                 </div>
                 <div className="w-full">
                     <Card>
@@ -81,7 +116,10 @@ export const UploadControls = () => {
                             <CardTitle>Account</CardTitle>
                             <CardDescription>
                                 <div>
-
+                                    isDelegated:
+                                    {isDelegated && (
+                                        "delegated"
+                                    )}
                                 </div>
                             </CardDescription>
                         </CardHeader>
@@ -92,6 +130,9 @@ export const UploadControls = () => {
                 </div>
                 <div>
                     Delegate
+                </div>
+                <div>
+                    <UploadForm />
                 </div>
             </div>
         </div>
