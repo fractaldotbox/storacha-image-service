@@ -24,6 +24,10 @@ describe("generate patterns", () => {
     ]
        
 
+  test('#generateStorachaSpaceEntries with corrupted entries ', async () => {
+    // TODO
+  });
+
 	test("#generateStorachaSpaceEntries", async () => {
         const entries = await generateStorachaSpaceEntries(patterns, cids);
 

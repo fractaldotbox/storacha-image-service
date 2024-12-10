@@ -62,31 +62,40 @@ export type EntryPattern = {
   
   const fetechMetadata = async (filePathWithCid:string)=>{
     const gateway = 'https://ipfs.io/ipfs/';
-    const metadata = await fetch(gateway + filePathWithCid)
-    .then(response => response.json())
+    try {
+      const metadata = await fetch(gateway + filePathWithCid)
+      .then(response => response.json())
   
-    return metadata;
+      return metadata;
+    } catch (error) {
+      console.error('error fetching metadata',filePathWithCid, error);
+      
+    } finally {
+      return {};
+    }
   
   }
   
       
 async function* generateWithPattern(pattern:EntryPattern, cid:string): AsyncGenerator<any> {
-  console.log('gen', pattern, cid);
   if(!pattern.metadata){
     throw new Error('metadata is required');
   }
 
   const filePathWithCid = pattern.metadata.replace('<cid>', cid);
-  console.log('fetch metadata',  filePathWithCid);
+  console.log('fetch metadata', filePathWithCid);
   const metadata = await fetechMetadata(filePathWithCid);
  
+  console.log('metadata', metadata);
 
   // TODO support other fields
 
-  yield {
-    ...metadata,
-    imageSrc: metadata.imageSrc.replace('./', cid + '/'),
-    contentSrc: metadata.imageSrc.replace('./', cid + '/'),
+  if(metadata.id){
+    yield {
+      ...metadata,
+      imageSrc: (metadata.imageSrc||'').replace('./', cid + '/'),
+      contentSrc: (metadata.contentSrc||'').replace('./', cid + '/'),
+    }
   }
 }
 
