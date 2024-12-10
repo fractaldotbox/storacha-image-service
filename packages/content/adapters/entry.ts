@@ -1,19 +1,11 @@
-import { defineCollection, z } from 'astro:content';
-import { glob } from 'astro/loaders';
-
-import { initStorachaClient } from '@repo/content'
-
-// we could point to remote schema too
-
-
-// fsLoader = glob({ pattern: "**\/*.json", base: "./src/content/httpcat" })
-
 
 /**
  * Goal is to support a dynamic list of images & content (.md) including end-user upload.
+ * Such list (index) could be consumed at astro to generate static sites
  * 
+ * At storacha, convention is applied to build index from source of truth to avoid
+ * maintaining and storing it for following reasons.
  * 
- * At storacha, convention is required to avoid a separated stored index for following reasons.
  * It is possible to list cids in a space, however we cannot tell if a cid is a wrapped directory and its file type
  * At best we have to stream it to determine file type with magic bytes
  * Ref: https://discuss.ipfs.tech/t/how-to-know-what-type-of-file-a-cid-represents/16007/2
@@ -62,54 +54,67 @@ import { initStorachaClient } from '@repo/content'
  * 
  */
 
-type EntryPattern = {
-  imageSrc: string,
-  contentSrc: string
+export type EntryPattern = {
+    metadata?: string,
+    imageSrc?: string,
+    contentSrc?: string
+  }
+  
+  const fetechMetadata = async (filePathWithCid:string)=>{
+    const gateway = 'https://ipfs.io/ipfs/';
+    const metadata = await fetch(gateway + filePathWithCid)
+    .then(response => response.json())
+  
+    return metadata;
+  
+  }
+  
+      
+async function* generateWithPattern(pattern:EntryPattern, cid:string): AsyncGenerator<any> {
+  console.log('gen', pattern, cid);
+  if(!pattern.metadata){
+    throw new Error('metadata is required');
+  }
+
+  const filePathWithCid = pattern.metadata.replace('<cid>', cid);
+  console.log('fetch metadata',  filePathWithCid);
+  const metadata = await fetechMetadata(filePathWithCid);
+ 
+
+  // TODO support other fields
+
+  yield {
+    ...metadata,
+    imageSrc: metadata.imageSrc.replace('./', cid + '/'),
+    contentSrc: metadata.imageSrc.replace('./', cid + '/'),
+  }
 }
 
-const parseMetadata = async ()=>{
-  const text = await fetch('https://ipfs.io/ipfs/bafybeifpiqvtu3tpmqtefd7dpx2dkcjorfwwn3mdhpqpb3egmbthjr57ua/100.md')
-  .then(response => response.json())
+  
+export const generateStorachaSpaceEntries = async (patterns: EntryPattern[], cids: any[])=>{
+  
+  const entries:any = [];
+  
+  const cidsExcluded = cids.filter(
+    cid=>!(patterns.find(pattern=>(pattern.imageSrc || '').match(cid)))
+  )
 
-  return text;
-
-}
-
-
-const generateStorachaSpaceEntries = async (patterns: EntryPattern[], entry: any)=>{
-
+  for (const pattern of patterns) {
+    if (pattern.metadata){
+      console.log('generate',cidsExcluded)
+      for (const cid of cidsExcluded){
+        for await (const entry of generateWithPattern(pattern, cid)){
+          console.log('entry',entry)
+          entries.push(entry);
+        }
+      }
+      
+    } else {
+      entries.push(pattern);
+    }
+   
+  }
+    
+    return entries;
   
 };
-
-const keyString = process.env.VITE_STORACHA_KEY!;
-const proofString = process.env.VITE_STORACHA_PROOF!;
-
-const httpcat = defineCollection({
-    loader: async ()=>{
-
-      const {client} = await initStorachaClient({
-        keyString,
-        proofString
-    });
-
-    const results =       await client.capability.upload.list({
-				cursor: "",
-				// cursor: "bafybeifpiqvtu3tpmqtefd7dpx2dkcjorfwwn3mdhpqpb3egmbthjr57ua",
-				size: 1,
-			});
-
-      console.log('results', results);
-
-      const parsed = await parse();
-      console.log('parsed', parsed);
-
-      return [];
-    },
-    schema: z.object({
-      id: z.string(),
-      imgSrc: z.string(),
-      contentSrc: z.string()
-    })
-  });
-  
-export const collections = { httpcat }

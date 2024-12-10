@@ -1,16 +1,27 @@
 {
   "name": "@repo/content",
   "version": "0.0.0",
+  "type": "module",
   "exports": {
     ".": "./index.ts"
   },
   "license": "MIT",
   "scripts": {
+    "test": "vitest",
+    "upload:httpcat": "pnpm dlx vite-node httpcat/upload.ts",
     "lint": "eslint \"**/*.ts\""
   },
   "devDependencies": {
     "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.10.1",
     "eslint": "^8.57.0",
-    "typescript": "5.5.4"
+    "typescript": "5.5.4",
+    "vitest": "^2.1.8"
+  },
+  "dependencies": {
+    "@noble/ed25519": "^2.1.0",
+    "@noble/hashes": "^1.6.1",
+    "@web3-storage/w3up-client": "^16.5.2",
+    "react-hook-form": "^7.53.2"
   }
 }
