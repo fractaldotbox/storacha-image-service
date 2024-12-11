@@ -148,6 +148,9 @@ importers:
 
   packages/content:
     dependencies:
+      '@ipld/dag-ucan':
+        specifier: ^3.4.0
+        version: 3.4.0
       '@noble/ed25519':
         specifier: ^2.1.0
         version: 2.1.0

@@ -59,3 +59,4 @@ This is a project to demo
 - Developed by @rogeriopvl
 - Original Images by Tomomi Imura (@girlie_mac)
 - [HttpCat to Web3 Storage](https://github.com/hakierka/http-cat-to-web3storage) by @hakierka
+  - note original repo missed images for 495.jpg, 496.jpg

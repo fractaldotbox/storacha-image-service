@@ -1,55 +1,65 @@
-import { createDelegation } from '@/lib/storacha';
-import type { APIRoute } from 'astro';
+export const prerender = false;
 
-// VITE_STORACHA_DID
-const keyString = process.env.VITE_STORACHA_KEY!;
-const proofString = process.env.VITE_STORACHA_PROOF!;
+import {
+	createDelegation,
+	initStorachaClient,
+	loadStorachaConfig,
+} from "@repo/content";
+import type { APIRoute } from "astro";
 
-export const GET: APIRoute =  async ({ params, request }) => {
-  const did = 'did:key:z6MkgEPYy8gDw5QNsmDwh8rHjQHaBvUoh9x6pGayS99dTaAY';
+/**
+ * Create delegation for user
+ *
+ * @returns
+ */
+export const GET: APIRoute = async (config) => {
+	const { params, request, url } = config;
+	const did = url.searchParams.get("did");
 
-  const clientConfig = {
-     keyString,
-     proofString
-  }
+	if (!did) {
+		return new Response("Missing DID", {
+			status: 500,
+		});
+	}
+	const { keyString, proofString } = loadStorachaConfig();
 
-  console.log('clientConfig',clientConfig);
+	const { client, space } = await initStorachaClient({
+		keyString,
+		proofString,
+	});
 
-  const delegationResults = await createDelegation({
-    did,
-    ...clientConfig
-  });
+	console.log("auth", did);
 
+	const delegationResults = await createDelegation(
+		{
+			client,
+			spaceDid: space.did(),
+		},
+		{
+			userDid: did,
+		},
+	);
 
-  
-  console.log('results',delegationResults)
-  
-    return new Response(delegationResults,{
-        status: 200,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      }
-    )
-}
-  
-export const POST: APIRoute = ({ request }) => {
-return new Response(JSON.stringify({
-    message: "This was a POST!"
-    })
-)
-}
+	return new Response(delegationResults, {
+		status: 200,
+		headers: {
+			"Content-Type": "application/json",
+		},
+	});
+};
 
 export const DELETE: APIRoute = ({ request }) => {
-return new Response(JSON.stringify({
-    message: "This was a DELETE!"
-    })
-)
-}
+	return new Response(
+		JSON.stringify({
+			message: "This was a DELETE!",
+		}),
+	);
+};
 
 export const ALL: APIRoute = ({ request }) => {
-return new Response(JSON.stringify({
-    message: `This was a ${request.method}!`
-    })
-)
-}
+	return new Response(
+		JSON.stringify({
+			message: `This was a ${request.method}!`,
+		}),
+	);
+};

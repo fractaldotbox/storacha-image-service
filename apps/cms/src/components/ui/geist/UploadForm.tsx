@@ -115,21 +115,33 @@ export function UploadForm({
                                 <FormItem>
                                     <FormLabel>File</FormLabel>
                                     <FormControl>
-                                        {isText ? (
-                                            <div className="w-full">
-                                                <Textarea id="file" {...field} className="h-[400px]" />
+                                        <>
+                                            {/* <div>
+                                                HTTP Code
+                                                <Input
+                                                    type="text"
+                                                    {...field}
+                                                />
                                             </div>
-                                        ) : (
-                                            <Input
-                                                id="file"
-                                                type="file"
-                                                {...field}
-                                                value={field?.value?.fileName}
-                                                onChange={(event) => {
-                                                    field.onChange(event?.target?.files?.[0]);
-                                                }}
-                                            />
-                                        )}
+                                            <Textarea id="description" {...field} className="h-[400px]" /> */}
+                                            {isText ? (
+                                                <div className="w-full">
+                                                    <Textarea id="file" {...field} className="h-[400px]" />
+                                                </div>
+                                            ) : (
+                                                <Input
+                                                    id="file"
+                                                    type="file"
+                                                    {...field}
+                                                    value={field?.value?.fileName}
+                                                    onChange={(event) => {
+                                                        field.onChange(event?.target?.files?.[0]);
+                                                    }}
+                                                />
+                                            )}
+
+                                        </>
+
                                     </FormControl>
                                     <FormDescription>Upload file to Filecoin</FormDescription>
                                     <FormMessage />

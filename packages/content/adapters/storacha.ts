@@ -1,7 +1,28 @@
-import { Signer } from "@web3-storage/w3up-client/principal/ed25519";
+import {
+	type DID as W3DID,
+	Signer,
+} from "@web3-storage/w3up-client/principal/ed25519";
 import * as Proof from "@web3-storage/w3up-client/proof";
-import { FileLike, ProgressStatus } from "@web3-storage/w3up-client/types";
-import type { DownloadProgress } from "ky";
+import type {
+	Client,
+	EmailAddress,
+	FileLike,
+	ProgressStatus,
+} from "@web3-storage/w3up-client/types";
+
+// from ky https://github.com/sindresorhus/ky/blob/1d92c203f7f60df37c03d60360237d8cb9bcb30a/source/types/options.ts#L15C1-L23C3
+export type DownloadProgress = {
+	percent: number;
+	transferredBytes: number;
+
+	/**
+	Note: If it's not possible to retrieve the body size, it will be `0`.
+	*/
+	totalBytes: number;
+};
+
+import * as DID from "@ipld/dag-ucan/did";
+import type { ServiceAbility } from "@web3-storage/w3up-client/types";
 
 // import * as DID from "@ipld/dag-ucan/did";
 import { create } from "@web3-storage/w3up-client";
@@ -14,6 +35,7 @@ import { sha512 } from "@noble/hashes/sha512";
 export type StorachaInitParams = {
 	keyString: string;
 	proofString: string;
+	store?: StoreMemory;
 };
 
 export type FileParams<T> = {
@@ -23,6 +45,21 @@ export type FileParams<T> = {
 
 //@ts-ignore
 ed.etc.sha512Sync = (...m) => sha512(ed.etc.concatBytes(...m));
+
+export interface StorachaConfig {
+	client: Client;
+	spaceDid: W3DID;
+}
+
+// TODO support other bundlers
+export const loadStorachaConfig = () => {
+	const keyString = process.env.VITE_STORACHA_KEY;
+	const proofString = process.env.VITE_STORACHA_PROOF;
+	if (!keyString || !proofString) {
+		throw new Error("Missing VITE_STORACHA_KEY or VITE_STORACHA_PROOF");
+	}
+	return { keyString, proofString };
+};
 
 // @w3ui use indexed DB with unextractable `CryptoKey`s.
 // https://github.com/storacha/w3ui/blob/main/packages/core/src/index.ts#L69
@@ -37,17 +74,73 @@ export const createClient = async (options: any) => {
 	return client;
 };
 
-export const authWithEmail = async (client: any, email: string) => {
+export const authWithEmail = async (client: Client, email: EmailAddress) => {
 	const account = await client.login(email);
 
 	console.log("account", account);
 	return account;
 };
 
+export const listFiles = async ({ client, spaceDid }: StorachaConfig) => {
+	await client.setCurrentSpace(spaceDid);
+	return await client.capability.upload.list({ cursor: "", size: 25 });
+};
+
+export const uploadFiles = async (
+	config: StorachaConfig,
+	{ file, uploadProgressCallback }: FileParams<FileLike>,
+) => {
+	const { client } = config;
+	const link = await client.uploadFile(file, {
+		onUploadProgress: (progress: ProgressStatus) => {
+			uploadProgressCallback?.({
+				transferredBytes: progress.loaded,
+				totalBytes: progress.total,
+				percent: progress.loaded / progress.total,
+			});
+		},
+	});
+
+	// if storacha skip upload for existing file, we need to update proress explicitly
+	uploadProgressCallback?.({
+		transferredBytes: link.byteLength,
+		totalBytes: link.byteLength,
+		percent: 1,
+	});
+	return link;
+};
+
+export const createDelegation = async (
+	config: StorachaConfig,
+	{
+		userDid,
+	}: {
+		userDid: string;
+	},
+) => {
+	const { client } = config;
+	const audience = DID.parse(userDid);
+	console.log("create delegation", audience.did());
+	const abilities = [
+		"upload/*",
+		"space/blob/add",
+		"space/index/add",
+		"filecoin/offer",
+		"upload/add",
+	] as ServiceAbility[];
+	const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // 24 hours from now
+	const delegation = await client.createDelegation(audience, abilities, {
+		expiration,
+	});
+
+	const archive = await delegation.archive();
+	return archive.ok;
+};
 
 export const initStorachaClient = async ({
 	keyString,
 	proofString,
+	store = new StoreMemory(),
 }: StorachaInitParams) => {
 	const principal = Signer.parse(keyString);
 	const client = await createClient({
@@ -55,55 +148,17 @@ export const initStorachaClient = async ({
 	});
 
 	// Add proof that this agent has been delegated capabilities on the space
-	const proof = await Proof.parse(proofString!);
+	const proof = await Proof.parse(proofString);
 	const space = await client.addSpace(proof);
+
+	await client.setCurrentSpace(space.did());
+
+	console.log(
+		`storcha init: principal ${principal.did()} space ${space.did()}`,
+	);
 
 	return {
 		client,
 		space,
-		listFile: async ()=>{
-
-			// client.setCurrentSpace()
-			return await client.capability.upload.list({ cursor: '', size: 25 });
-		},
-		uploadFile: async ({
-			file,
-			uploadProgressCallback,
-		}: FileParams<FileLike>) => {
-			const link = await client.uploadFile(file, {
-				// fetchWithUploadProgress: async (url, init) => {
-				// 	return ky.put(url, {
-				// 		...init,
-				// 		// custom progress handler not receiving actual progress
-				// 		onDownloadProgress: (progress) => {	}
-				// 	})
-				// },
-				onUploadProgress: (progress: ProgressStatus) => {
-					uploadProgressCallback?.({
-						transferredBytes: progress.loaded,
-						totalBytes: progress.total,
-						percent: progress.loaded / progress.total,
-					});
-				},
-			});
-
-			// if storacha skip upload for existing file, we need to update proress explicitly
-			uploadProgressCallback?.({
-				transferredBytes: link.byteLength,
-				totalBytes: link.byteLength,
-				percent: 1,
-			});
-			return link;
-		},
-	};
-};
-
-// For hooks refers to w3ui implementation
-// https://github.com/storacha/w3ui/blob/835ea5a2a1476e8480354c680535e16a92e6d79d/packages/react/src/hooks.ts
-// TODO use jotai for async hooks to init client in wagmi style
-
-export const parseStorachaResults = () => {
-	return {
-		cid: "",
 	};
 };

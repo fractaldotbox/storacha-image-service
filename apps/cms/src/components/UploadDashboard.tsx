@@ -7,19 +7,29 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card"
-import { Authenticator, Client, Provider, useW3 } from "@w3ui/react";
+import { Provider, useW3 } from "@w3ui/react";
+import type {
+    Capabilities,
+    Client,
+    Delegation,
+} from "@web3-storage/w3up-client/types";
 import StorachaAuth from "./StorachaAuth";
 import StorachaProvider from "./StorachaProvider";
 import { useEffect, useState } from "react";
-import { Delegation, extract, isDelegation } from "@web3-storage/w3up-client/delegation";
-import { UploadForm } from "./ui/geist/UploadForm";
+import { extract } from "@web3-storage/w3up-client/delegation";
+import { UploadForm, type FileParams } from "./ui/geist/UploadForm";
+import { createToast } from "@/hooks/upload-toast";
+import { uploadFiles, type DownloadProgress } from "@repo/content";
 
 
-const requestDelegation = ({ client }: {
-    client: Client
+const requestDelegation = ({ did }: {
+    did: string
 }) => {
+    const search = new URLSearchParams({
+        did
+    });
 
-    return fetch('/httpcat/api/auth')
+    return fetch(`/httpcat/api/auth?${search.toString()}`)
         .then(response => response.arrayBuffer())
         .then(async arrayBuffer => {
             const delegation = await extract(new Uint8Array(arrayBuffer))
@@ -38,27 +48,34 @@ export const useDelegateAccount = () => {
 
     const [{ client, accounts }] = useW3();
 
-    const [isDelegated, setIsDelegated] = useState(false);
+    const [delegation, setDelegation] = useState<Delegation<Capabilities> | null>(null);
+
+
+    /**
+     * Delegate to client/agent, not the account did
+     */
 
     useEffect(() => {
         (async () => {
-
             if (!client) {
                 return;
             }
+            const did = client.did();
+            // TODO delegate to account vs client 
 
-            const delegation = await requestDelegation({ client });
+            const delegation = await requestDelegation({ did });
 
+            console.log(`delegation to ${did}`, delegation.ok.root.cid.toString())
             const space = await client.addSpace(delegation.ok)
             client.setCurrentSpace(space.did())
 
-            setIsDelegated(true);
+            setDelegation(delegation.ok);
 
         })();
-    }, [client, isDelegated]);
+    }, [client]);
 
     return {
-        isDelegated
+        delegation
     }
 
 
@@ -68,23 +85,30 @@ export const useDelegateAccount = () => {
 export const UploadControls = () => {
     const [{ spaces, client, accounts }] = useW3();
 
-    const { isDelegated } = useDelegateAccount();
+    const { delegation } = useDelegateAccount();
 
 
     const args = {
         isText: false,
+        isShowProgress: true,
         uploadFile: async ({ file, uploadProgressCallback }: FileParams<File>) => {
-            const { uploadFile } = await initStorachaClient({
-                keyString: STORACHA_KEY,
-                proofString: STORACHA_PROOF!,
-            });
+            // uploadFiles()
+            // createToast({ cid: link.toString(), name: "" });
+            console.log('file', file)
 
-            const link = await uploadFile({ file, uploadProgressCallback });
+            if (client) {
+                const config = {
+                    client: client as unknown as Client,
+                    spaceDid: spaces?.[0]?.did()
+                }
+                return await uploadFiles(config, {
+                    file, uploadProgressCallback
+                })
+            }
 
-            createToast({ cid: link.toString(), name: "" });
         },
     }
-    console.log('isDelegated', isDelegated)
+    console.log('isDelegated', delegation)
     return (
         <div>
             <div className="flex flex-col gap-2">
@@ -116,10 +140,10 @@ export const UploadControls = () => {
                             <CardTitle>Account</CardTitle>
                             <CardDescription>
                                 <div>
-                                    isDelegated:
-                                    {isDelegated && (
-                                        "delegated"
+                                    {delegation && (
+                                        "✅Delegated"
                                     )}
+                                    {delegation?.root?.cid?.toString()}
                                 </div>
                             </CardDescription>
                         </CardHeader>
@@ -129,10 +153,15 @@ export const UploadControls = () => {
                     </Card>
                 </div>
                 <div>
-                    Delegate
-                </div>
-                <div>
-                    <UploadForm />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Upload</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <UploadForm {...args} />
+                        </CardContent>
+                    </Card>
+
                 </div>
             </div>
         </div>

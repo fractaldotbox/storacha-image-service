@@ -1,14 +1,18 @@
 ---
-import { getCollection, type CollectionEntry } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import { getCollection, type CollectionEntry } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
 
-import { Card, CardHeader, CardTitle, CardContent } from '../../components/ui/card';
-import { Button } from '@/components/ui/button';
-import StorachaProvider from '@/components/StorachaProvider';
+import {
+	Card,
+	CardHeader,
+	CardTitle,
+	CardContent,
+} from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import StorachaProvider from "@/components/StorachaProvider";
+import { getIpfsGatewayUrl } from "@/lib/gateway";
 
-
-const httpcats = await getCollection('httpcat');
-
+const httpcats = await getCollection("httpcat");
 ---
 
 <Layout>
@@ -17,28 +21,29 @@ const httpcats = await getCollection('httpcat');
         <h2 class="text-2xl font-bold">
             HTTP Cat
         </h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
-                <a href={`/httpcat/${data.id}`}>
-                  <Card className="bg-white p-4 rounded shadow">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-semibold mb-2">{data.id}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <img src={data.imgSrc} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
-                        </CardContent>
-                 </Card>
-                </a>
-            ))}
-        </div>
-        <div class="mt-10">
+        <div class="my-2 py-2">
             <a href="/httpcat/upload">
-                <Button>
+                <Button variant="outline">
                  Upload
                 </Button>
             </a>
 
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
+                <a href={getIpfsGatewayUrl(data.id)}>
+                  <Card className="bg-white p-4 rounded shadow">
+                        <CardHeader>
+                            <CardTitle className="text-xl font-semibold mb-2">{data.id}</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <img src={getIpfsGatewayUrl(data.imageSrc)} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
+                        </CardContent>
+                 </Card>
+                </a>
+            ))}
+        </div>
+
     </div>
     </StorachaProvider>
 </Layout>

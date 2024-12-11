@@ -87,7 +87,7 @@ export function AuthenticationEnsurer({ children }: { children: ReactNode }): Re
 
 function StorachaAuth() {
     return (
-        <div className='bg-grad flex flex-col items-center h-screen'>
+        <div className='items-center'>
             <AuthenticationEnsurer>
                 <Identity />
             </AuthenticationEnsurer>
