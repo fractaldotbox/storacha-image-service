@@ -1,16 +1,16 @@
 {
-  "private": true,
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
-  },
-  "devDependencies": {
-    "eslint": "^8.57.0",
-    "prettier": "^3.2.5",
-    "turbo": "^2.3.3"
-  },
-  "packageManager": "pnpm@8.15.6",
-  "name": "with-vite"
+	"private": true,
+	"scripts": {
+		"build": "turbo build",
+		"dev": "turbo dev",
+		"lint": "turbo lint",
+		"check": "biome check . --changed --no-errors-on-unmatched",
+		"check:fix": "biome check . --write --no-errors-on-unmatched"
+	},
+	"devDependencies": {
+		"turbo": "^2.3.3",
+		"@biomejs/biome": "^1.9.4"
+	},
+	"packageManager": "pnpm@8.15.6",
+	"name": "with-vite"
 }

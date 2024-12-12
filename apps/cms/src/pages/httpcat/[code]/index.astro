@@ -1,29 +1,22 @@
 ---
-import Layout from '@/layouts/Layout.astro';
-import { getEntry, getCollection } from 'astro:content';
-
-
-
+import { getCollection, getEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
 
 export async function getStaticPaths() {
-  const httpcats = await getCollection('httpcat');
-  
-  return httpcats.map(({data}) => ({
-        params: {
-          code: data.id
-        }
-    }));
-  
+	const httpcats = await getCollection("httpcat");
+
+	return httpcats.map(({ data }) => ({
+		params: {
+			code: data.id,
+		},
+	}));
 }
 
-const { code }  = Astro.params;
+const { code } = Astro.params;
 
-
-
-const httpcat = await getEntry('httpcat', code);
+const httpcat = await getEntry("httpcat", code);
 
 const { data } = httpcat;
-
 ---
 
 <Layout>
