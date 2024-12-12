@@ -45,19 +45,3 @@ export const GET: APIRoute = async (config) => {
 		},
 	});
 };
-
-export const DELETE: APIRoute = ({ request }) => {
-	return new Response(
-		JSON.stringify({
-			message: "This was a DELETE!",
-		}),
-	);
-};
-
-export const ALL: APIRoute = ({ request }) => {
-	return new Response(
-		JSON.stringify({
-			message: `This was a ${request.method}!`,
-		}),
-	);
-};
