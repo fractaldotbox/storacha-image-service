@@ -28,8 +28,6 @@ export const GET: APIRoute = async (config) => {
 		proofString,
 	});
 
-	console.log("auth", did);
-
 	const delegationResults = await createDelegation(
 		{
 			client,

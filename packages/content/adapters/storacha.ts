@@ -122,7 +122,6 @@ export const createDelegation = async (
 	const audience = DID.parse(userDid);
 	console.log("create delegation", audience.did());
 	const abilities = [
-		"upload/*",
 		"space/blob/add",
 		"space/index/add",
 		"filecoin/offer",
