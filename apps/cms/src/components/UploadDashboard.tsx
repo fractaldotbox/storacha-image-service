@@ -6,7 +6,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { createToast } from "@/hooks/upload-toast";
+import { IpfsGateway, uploadSuccessToast } from "@/hooks/upload-toast";
 import { type DownloadProgress, uploadFiles } from "@repo/content";
 import { Provider, useW3 } from "@w3ui/react";
 import { extract } from "@web3-storage/w3up-client/delegation";
@@ -18,7 +18,9 @@ import type {
 import { useEffect, useState } from "react";
 import StorachaAuth from "./StorachaAuth";
 import StorachaProvider from "./StorachaProvider";
-import { type FileParams, UploadForm } from "./ui/geist/UploadForm";
+import { UploadForm, UploadFormType, type UploadFilesParams } from "./ui/UploadForm";
+import { Toaster } from "./ui/toaster";
+import { SpaceInfoCard } from "./SpaceInfoCard";
 
 const requestDelegation = ({
 	did,
@@ -61,13 +63,13 @@ export const useDelegateAccount = () => {
 				return;
 			}
 			const did = client.did();
-			// TODO delegate to account vs client
 
 			const delegation = await requestDelegation({ did });
 
 			console.log(`delegation to ${did}`, delegation.ok.root.cid.toString());
 			const space = await client.addSpace(delegation.ok);
-			client.setCurrentSpace(space.did());
+			console.log('set space', space.name, space.did());
+			await client.setCurrentSpace(space.did());
 
 			setDelegation(delegation.ok);
 		})();
@@ -78,48 +80,74 @@ export const useDelegateAccount = () => {
 	};
 };
 
+type UploadFormFields = { file: File, code: string, description: string }
+
+
+const mapFieldsAsFiles = (fields: UploadFormFields) => {
+	const { file, code, description } = fields;
+	const imageFileName = `${code}.jpg`;
+	const descriptionFileName = `${code}.md`;
+	const metadataFileName = `metadata.json`;
+
+	const imageFile = new File([file], imageFileName, {
+		type: "image/jpg",
+	});
+
+
+	const descriptionFile = new File([description], descriptionFileName, {
+		type: "text/plain",
+	});
+
+	const metadata = {
+		id: code.toString(),
+		imageSrc: `./${imageFileName}`,
+		contentSrc: `./${descriptionFileName}`,
+	}
+
+	const metadataFile = new File([JSON.stringify(metadata)], metadataFileName, {
+		type: "application/json",
+	});
+
+
+	return [imageFile, descriptionFile, metadataFile];
+}
+
 export const UploadControls = () => {
 	const [{ spaces, client, accounts }] = useW3();
 
 	const { delegation } = useDelegateAccount();
 
+
 	const args = {
 		isText: false,
 		isShowProgress: true,
-		uploadFile: async ({ file, uploadProgressCallback }: FileParams<File>) => {
-			// uploadFiles()
-			// createToast({ cid: link.toString(), name: "" });
-			console.log("file", file);
-
-			if (client) {
-				const config = {
-					client: client as unknown as Client,
-					spaceDid: spaces?.[0]?.did(),
-				};
-				return await uploadFiles(config, {
-					file,
-					uploadProgressCallback,
-				});
+		uploadFiles: async ({ file, code, description, uploadProgressCallback }: UploadFilesParams<UploadFormFields>) => {
+			if (!client) {
+				return;
 			}
-		},
+			const config = {
+				client: client as unknown as Client,
+				spaceDid: spaces?.[0]?.did(),
+			};
+
+
+			const link = await uploadFiles(config, {
+				files: mapFieldsAsFiles({ file, code, description }),
+				uploadProgressCallback,
+			});
+
+
+			uploadSuccessToast({ cid: link.toString(), name: code, gateway: IpfsGateway.IpfsIo });
+		}
 	};
-	console.log("isDelegated", delegation);
+
+	const space = client?.currentSpace();
+
 	return (
 		<div>
 			<div className="flex flex-col gap-2">
 				<div className="w-full">
-					<Card>
-						<CardHeader>
-							<CardTitle>Space Info</CardTitle>
-							<CardDescription>
-								<div>Space name:</div>
-
-								<div className="font-bold">{spaces?.[0]?.meta()?.name}</div>
-								<div>Space id:</div>
-								<div className="font-bold">{spaces?.[0]?.did()}</div>
-							</CardDescription>
-						</CardHeader>
-					</Card>
+					<SpaceInfoCard name={space?.name} did={space?.did()} />
 				</div>
 				<div className="w-full">
 					<Card>
@@ -137,13 +165,13 @@ export const UploadControls = () => {
 						</CardContent>
 					</Card>
 				</div>
-				<div>
+				<div className="mb-20">
 					<Card>
 						<CardHeader>
 							<CardTitle>Upload</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<UploadForm {...args} />
+							<UploadForm type={UploadFormType.MultifieldsAsDirectory} {...args} />
 						</CardContent>
 					</Card>
 				</div>
@@ -156,6 +184,7 @@ export const UploadDashboard = () => {
 	return (
 		<StorachaProvider>
 			<UploadControls />
+			<Toaster />
 		</StorachaProvider>
 	);
 };

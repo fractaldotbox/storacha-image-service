@@ -39,7 +39,7 @@ export type StorachaInitParams = {
 };
 
 export type FileParams<T> = {
-	file: T;
+	files: T[];
 	uploadProgressCallback?: (data: DownloadProgress) => void;
 };
 
@@ -77,7 +77,6 @@ export const createClient = async (options: any) => {
 export const authWithEmail = async (client: Client, email: EmailAddress) => {
 	const account = await client.login(email);
 
-	console.log("account", account);
 	return account;
 };
 
@@ -88,25 +87,36 @@ export const listFiles = async ({ client, spaceDid }: StorachaConfig) => {
 
 export const uploadFiles = async (
 	config: StorachaConfig,
-	{ file, uploadProgressCallback }: FileParams<FileLike>,
+	{ files, uploadProgressCallback }: FileParams<FileLike>,
 ) => {
 	const { client } = config;
-	const link = await client.uploadFile(file, {
-		onUploadProgress: (progress: ProgressStatus) => {
-			uploadProgressCallback?.({
-				transferredBytes: progress.loaded,
-				totalBytes: progress.total,
-				percent: progress.loaded / progress.total,
-			});
-		},
-	});
+	let link;
+	const onUploadProgress = (progress: ProgressStatus) => {
+		uploadProgressCallback?.({
+			transferredBytes: progress.loaded,
+			totalBytes: progress.total,
+			percent: progress.loaded / progress.total,
+		});
+	};
+	if (files.length == 1) {
+		const [file] = files;
+		link = await client.uploadFile(file, {
+			onUploadProgress,
+		});
+	} else {
+		// seems wont return actual progress
+		link = await client.uploadDirectory(files, {
+			onUploadProgress,
+		});
+	}
 
-	// if storacha skip upload for existing file, we need to update proress explicitly
-	uploadProgressCallback?.({
-		transferredBytes: link.byteLength,
-		totalBytes: link.byteLength,
-		percent: 1,
-	});
+	if (uploadProgressCallback) {
+		uploadProgressCallback({
+			transferredBytes: link.byteLength,
+			totalBytes: link.byteLength,
+			percent: 1,
+		});
+	}
 	return link;
 };
 
@@ -119,8 +129,10 @@ export const createDelegation = async (
 	},
 ) => {
 	const { client } = config;
+
 	const audience = DID.parse(userDid);
 	console.log("create delegation", audience.did());
+
 	const abilities = [
 		"space/blob/add",
 		"space/index/add",
@@ -146,7 +158,6 @@ export const initStorachaClient = async ({
 		principal,
 	});
 
-	// Add proof that this agent has been delegated capabilities on the space
 	const proof = await Proof.parse(proofString);
 	const space = await client.addSpace(proof);
 

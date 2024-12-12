@@ -66,10 +66,11 @@ const fetechMetadata = async (filePathWithCid: string) => {
 			response.json(),
 		);
 
+		console.log("fetch", gateway + filePathWithCid, metadata);
+
 		return metadata;
 	} catch (error) {
 		console.error("error fetching metadata", filePathWithCid, error);
-	} finally {
 		return {};
 	}
 };
@@ -83,7 +84,6 @@ async function* generateWithPattern(
 	}
 
 	const filePathWithCid = pattern.metadata.replace("<cid>", cid);
-	console.log("fetch metadata", filePathWithCid);
 	const metadata = await fetechMetadata(filePathWithCid);
 
 	console.log("metadata", metadata);

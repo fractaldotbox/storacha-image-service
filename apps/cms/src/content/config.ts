@@ -14,10 +14,12 @@ const { keyString, proofString } = loadStorachaConfig();
 
 const httpcat = defineCollection({
 	loader: async () => {
-		const { client } = await initStorachaClient({
+		const { client, space } = await initStorachaClient({
 			keyString,
 			proofString,
 		});
+
+		console.log("generate with space", space.name, space.did());
 
 		const { results } = await client.capability.upload.list({
 			cursor: "",
