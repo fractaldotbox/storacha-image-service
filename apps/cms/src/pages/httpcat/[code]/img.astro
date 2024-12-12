@@ -1,0 +1,17 @@
+---
+import { getCollection, getEntry } from "astro:content";
+
+export async function getStaticPaths() {
+	const httpcats = await getCollection("httpcat");
+
+	return httpcats.map(({ data }) => ({
+		params: {
+			code: data.id,
+		},
+	}));
+}
+
+return Astro.redirect(
+	"https://ipfs.io/ipfs/bafybeid35a5ep7rqpdjy2kqm5f2gveagn7e6gnegpolzw7mtmzul4qp4k4/100.jpg",
+);
+---

@@ -1,6 +1,9 @@
 ---
 import { getCollection, getEntry } from "astro:content";
+import { Button } from "@/components/ui/button";
 import Layout from "@/layouts/Layout.astro";
+import { getIpfsGatewayUrl } from "@/lib/gateway";
+import { marked } from "marked";
 
 export async function getStaticPaths() {
 	const httpcats = await getCollection("httpcat");
@@ -17,25 +20,44 @@ const { code } = Astro.params;
 const httpcat = await getEntry("httpcat", code);
 
 const { data } = httpcat;
+
+const descriptionMd = await fetch(getIpfsGatewayUrl(data.contentSrc)).then(
+	(res) => res.text(),
+);
+
+const description = marked.parse(descriptionMd);
 ---
 
 <Layout>
     <div class="container text-center">
         
         <h2 class="text-center text-3xl font-bold mb-4">{data.id}</h2>
-        
-        <div class="text-center m-auto p-10">
-            <img src={data.imgSrc} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
-            <div>
-                {data.description}
+    
+
+        <div class="text-center m-auto p-5">
+            <div class="p-2">
+                Image Alias Url: 
+                <a href={Astro.url + "/img"}>
+                    {Astro.url + "/img"}
+                </a>
+                
+            </div>
+            <img src={getIpfsGatewayUrl(data.imageSrc)}  alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
+            <div class="p-2 text-left">
+                <Fragment set:html={description}/>
             </div>
         </div>
          
         <hr />
-        <div class="mt-10">
-            <h2 class="text-2xl">
+        <div class="mt-10 pb-5">
+            <h2 class="text-2xl mb-5">
                 Upload your own HTTP Cat
             </h2>
+            <a href="/httpcat/upload">
+                <Button variant="outline">
+                 Upload
+                </Button>
+            </a>
         </div>
     </div>
 </Layout>
