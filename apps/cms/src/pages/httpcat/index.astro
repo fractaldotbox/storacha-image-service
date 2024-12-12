@@ -44,7 +44,7 @@ Astro.props.space = space;
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
-                <a href={getIpfsGatewayUrl(data.id)}>
+                <a href={`/httpcat/${data.id}`}>
                   <Card className="bg-white p-4 rounded shadow">
                         <CardHeader>
                             <CardTitle className="text-xl font-semibold mb-2">{data.id}</CardTitle>
