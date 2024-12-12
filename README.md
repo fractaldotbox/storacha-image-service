@@ -33,7 +33,7 @@ This is a project to demo
   - upload page
 
 - use w3ui/react in single component for now and separate static vs upload page (auth requires)
-- switch to jotai for client state
+- TODO switch to jotai for client state
   - https://docs.astro.build/en/recipes/sharing-state-islands/
 
 ## Demo projects

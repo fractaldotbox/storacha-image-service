@@ -8,7 +8,6 @@
 		"check:fix": "biome check . --write --no-errors-on-unmatched"
 	},
 	"devDependencies": {
-		"eslint": "^8.57.0",
 		"prettier": "^3.2.5",
 		"turbo": "^2.3.3",
 		"wrangler": "^3.92.0",
