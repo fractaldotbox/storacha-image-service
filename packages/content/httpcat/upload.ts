@@ -1,7 +1,7 @@
+import { openAsBlob, readdirSync, statSync } from "node:fs";
+import { basename, relative, resolve } from "node:path";
 import { FileLike } from "@web3-storage/w3up-client/types";
 import { initStorachaClient, loadStorachaConfig } from "../adapters/storacha";
-import { readdirSync, statSync, openAsBlob } from "node:fs";
-import { resolve, relative, basename } from "node:path";
 
 import { readDirectoryAsFiles } from "../adapters/fs";
 

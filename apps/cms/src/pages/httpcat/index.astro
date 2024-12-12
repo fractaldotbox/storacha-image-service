@@ -1,16 +1,16 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
+import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
+import StorachaProvider from "@/components/StorachaProvider";
+import { Button } from "@/components/ui/button";
+import { getIpfsGatewayUrl } from "@/lib/gateway";
 import {
 	Card,
+	CardContent,
 	CardHeader,
 	CardTitle,
-	CardContent,
 } from "../../components/ui/card";
-import { Button } from "@/components/ui/button";
-import StorachaProvider from "@/components/StorachaProvider";
-import { getIpfsGatewayUrl } from "@/lib/gateway";
 
 const httpcats = await getCollection("httpcat");
 ---

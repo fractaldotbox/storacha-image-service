@@ -1,2 +1,2 @@
-export * from './adapters/storacha';
-export * from './adapters/entry';
+export * from "./adapters/storacha";
+export * from "./adapters/entry";

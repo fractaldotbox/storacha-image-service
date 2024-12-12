@@ -6,39 +6,37 @@ import { toast } from "@/hooks/use-toast";
 // getGatewayUrlWithCid
 
 export enum IpfsGateway {
-    Lighthouse = "lighthouse",
-    Akave = "akave",
-    IpfsIo = "ipfsio",
+	Lighthouse = "lighthouse",
+	Akave = "akave",
+	IpfsIo = "ipfsio",
 }
 
 export const getGatewayUrlWithCid = (
-    cid: string,
-    gateway: IpfsGateway = IpfsGateway.IpfsIo,
+	cid: string,
+	gateway: IpfsGateway = IpfsGateway.IpfsIo,
 ) => {
-
-    if (gateway === IpfsGateway.IpfsIo) {
-        return `https://ipfs.io/ipfs/${cid}`;
-    }
+	if (gateway === IpfsGateway.IpfsIo) {
+		return `https://ipfs.io/ipfs/${cid}`;
+	}
 };
 
-
 export const createToast = ({
-    cid,
-    name,
-    gateway = IpfsGateway.IpfsIo,
+	cid,
+	name,
+	gateway = IpfsGateway.IpfsIo,
 }: { cid: string; name: string; gateway?: IpfsGateway }) => {
-    const url = getGatewayUrlWithCid(cid, gateway);
+	const url = getGatewayUrlWithCid(cid, gateway);
 
-    toast({
-        title: "File uploaded",
-        description: (
-            <div>
-                File uploaded with {name} <br />
-                CID:
-                <a href={url} target="_blank">
-                    {cid}
-                </a>
-            </div>
-        ),
-    });
+	toast({
+		title: "File uploaded",
+		description: (
+			<div>
+				File uploaded with {name} <br />
+				CID:
+				<a href={url} target="_blank">
+					{cid}
+				</a>
+			</div>
+		),
+	});
 };
