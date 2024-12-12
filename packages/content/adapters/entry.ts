@@ -86,10 +86,6 @@ async function* generateWithPattern(
 	const filePathWithCid = pattern.metadata.replace("<cid>", cid);
 	const metadata = await fetechMetadata(filePathWithCid);
 
-	console.log("metadata", metadata);
-
-	// TODO support other fields
-
 	if (metadata.id) {
 		yield {
 			...metadata,

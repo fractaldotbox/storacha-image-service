@@ -2,6 +2,7 @@
 import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
+import { SpaceInfoCard } from "@/components/SpaceInfoCard";
 import StorachaProvider from "@/components/StorachaProvider";
 import { Button } from "@/components/ui/button";
 import { getIpfsGatewayUrl } from "@/lib/gateway";
@@ -11,7 +12,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from "../../components/ui/card";
-import { SpaceInfoCard } from "@/components/SpaceInfoCard";
 
 import { initStorachaClient, loadStorachaConfig } from "@repo/content";
 

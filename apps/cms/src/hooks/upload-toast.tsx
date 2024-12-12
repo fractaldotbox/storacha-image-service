@@ -22,7 +22,7 @@ export const getGatewayUrlWithCid = (
 
 export const uploadSuccessToast = ({
 	cid,
-	name = '',
+	name = "",
 	gateway = IpfsGateway.IpfsIo,
 }: { cid: string; name?: string; gateway?: IpfsGateway }) => {
 	const url = getGatewayUrlWithCid(cid, gateway);
@@ -31,7 +31,8 @@ export const uploadSuccessToast = ({
 		title: "File uploaded",
 		description: (
 			<div>
-				File uploaded {name}<br />
+				File uploaded {name}
+				<br />
 				CID:
 				<a href={url} target="_blank">
 					{cid}

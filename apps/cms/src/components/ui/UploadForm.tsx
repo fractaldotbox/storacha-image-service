@@ -1,12 +1,7 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { ZodType, z } from "zod";
-import { FileInputField } from "./FileInputField";
 import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -15,8 +10,12 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { DownloadProgress } from "ky";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { ZodType, z } from "zod";
+import { FileInputField } from "./FileInputField";
 import { Input } from "./input";
 
 const lorem = `# Description
@@ -98,7 +97,6 @@ UPLOAD_FORM_BY_TYPE[UploadFormType.MultifieldsAsDirectory] = {
 					</FormItem>
 				)}
 			/>
-
 
 			<FormField
 				control={form.control}
@@ -197,7 +195,6 @@ export function UploadFormWithFields<S extends ZodType<any, any, any>>({
 		});
 
 		uploadFiles({ ...data, uploadProgressCallback } as any);
-
 	}
 
 	return (
@@ -209,7 +206,9 @@ export function UploadFormWithFields<S extends ZodType<any, any, any>>({
 						className="w-[600px] space-y-6"
 					>
 						{createFormFields(form)}
-						<Button type="submit" variant="outline">Submit</Button>
+						<Button type="submit" variant="outline">
+							Submit
+						</Button>
 					</form>
 				</div>
 				<div>

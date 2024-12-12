@@ -16,11 +16,15 @@ import type {
 	Delegation,
 } from "@web3-storage/w3up-client/types";
 import { useEffect, useState } from "react";
+import { SpaceInfoCard } from "./SpaceInfoCard";
 import StorachaAuth from "./StorachaAuth";
 import StorachaProvider from "./StorachaProvider";
-import { UploadForm, UploadFormType, type UploadFilesParams } from "./ui/UploadForm";
+import {
+	type UploadFilesParams,
+	UploadForm,
+	UploadFormType,
+} from "./ui/UploadForm";
 import { Toaster } from "./ui/toaster";
-import { SpaceInfoCard } from "./SpaceInfoCard";
 
 const requestDelegation = ({
 	did,
@@ -68,7 +72,7 @@ export const useDelegateAccount = () => {
 
 			console.log(`delegation to ${did}`, delegation.ok.root.cid.toString());
 			const space = await client.addSpace(delegation.ok);
-			console.log('set space', space.name, space.did());
+			console.log("set space", space.name, space.did());
 			await client.setCurrentSpace(space.did());
 
 			setDelegation(delegation.ok);
@@ -80,8 +84,7 @@ export const useDelegateAccount = () => {
 	};
 };
 
-type UploadFormFields = { file: File, code: string, description: string }
-
+type UploadFormFields = { file: File; code: string; description: string };
 
 const mapFieldsAsFiles = (fields: UploadFormFields) => {
 	const { file, code, description } = fields;
@@ -93,7 +96,6 @@ const mapFieldsAsFiles = (fields: UploadFormFields) => {
 		type: "image/jpg",
 	});
 
-
 	const descriptionFile = new File([description], descriptionFileName, {
 		type: "text/plain",
 	});
@@ -102,26 +104,29 @@ const mapFieldsAsFiles = (fields: UploadFormFields) => {
 		id: code.toString(),
 		imageSrc: `./${imageFileName}`,
 		contentSrc: `./${descriptionFileName}`,
-	}
+	};
 
 	const metadataFile = new File([JSON.stringify(metadata)], metadataFileName, {
 		type: "application/json",
 	});
 
-
 	return [imageFile, descriptionFile, metadataFile];
-}
+};
 
 export const UploadControls = () => {
 	const [{ spaces, client, accounts }] = useW3();
 
 	const { delegation } = useDelegateAccount();
 
-
 	const args = {
 		isText: false,
 		isShowProgress: true,
-		uploadFiles: async ({ file, code, description, uploadProgressCallback }: UploadFilesParams<UploadFormFields>) => {
+		uploadFiles: async ({
+			file,
+			code,
+			description,
+			uploadProgressCallback,
+		}: UploadFilesParams<UploadFormFields>) => {
 			if (!client) {
 				return;
 			}
@@ -130,15 +135,17 @@ export const UploadControls = () => {
 				spaceDid: spaces?.[0]?.did(),
 			};
 
-
 			const link = await uploadFiles(config, {
 				files: mapFieldsAsFiles({ file, code, description }),
 				uploadProgressCallback,
 			});
 
-
-			uploadSuccessToast({ cid: link.toString(), name: code, gateway: IpfsGateway.IpfsIo });
-		}
+			uploadSuccessToast({
+				cid: link.toString(),
+				name: code,
+				gateway: IpfsGateway.IpfsIo,
+			});
+		},
 	};
 
 	const space = client?.currentSpace();
@@ -171,7 +178,10 @@ export const UploadControls = () => {
 							<CardTitle>Upload</CardTitle>
 						</CardHeader>
 						<CardContent>
-							<UploadForm type={UploadFormType.MultifieldsAsDirectory} {...args} />
+							<UploadForm
+								type={UploadFormType.MultifieldsAsDirectory}
+								{...args}
+							/>
 						</CardContent>
 					</Card>
 				</div>
