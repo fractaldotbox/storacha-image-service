@@ -2,15 +2,16 @@
 
 # Motiviations
 
-Often we need performant and flexible image service, from avatar to placeholders.
+Often we need performant and flexible image service at websites, from avatars to placeholders.
 Applying Generative AI is great but we need cost effective storage with fast (cached) retrieval
 
-For best of both worlds, this is a micro CMS to store asasets on filecoin (via storacha), host static sites with API & optimized retrieval urls and welcome end-user to contribute in a decentralized way 
+For best of both worlds, this is a micro CMS to 
+1. store assets on filecoin (via storacha), deploy static sites with API & optimized retrieval urls
+2.  elcome end-user to contribute in a decentralized way 
 
-This is a project to demo
+serving as a demo for
 - storacha's UCAN supporting [Delegated upload flow](https://docs.storacha.network/concepts/architecture-options/#delegated)
-- setup static sites and API with retrieval of assets on filecoin 
-
+- creating immutable trustless websites on IPFS/Filecoin
 
 ## Deployment targets
 - Cloudflare pages
@@ -19,16 +20,14 @@ This is a project to demo
   - `env-cmd pnpm --filter cms deploy`
 - Fleek (TODO)
 
-## Uploading Assets (Bootstrap)
-- we opt for supporting dynamic content on unopinionated date source and gateway (instead of relying astro to serve static assets from where site is deployed).
-- Thus we decoupled content upload step
-- run `env-cmd pnpm --filter content upload:httpcat`
-- https://ipfs.io/ipfs/bafybeieedes5ltapehw3z3svjf5oty5v4r54rdaf54nq5d62m67nhl3aw4
+## Uploading content (Bootstrap)
+- we opt for supporting dynamic content on unopinionated data source and gateway (instead of relying astro to serve static assets from where site is deployed).
+- Thus we decoupled content upload flow via storacha, from site deployment 
+  - run `env-cmd pnpm --filter content upload:httpcat`
 
 ## Architecture
-- Delegated approach
-
-- Astro (5.0) to export a static sites, consist of
+- Pre-created space with UCAN for direct end-user upload in [Delegated upload flow](https://docs.storacha.network/concepts/architecture-options/#delegated)
+- Astro (5.0) to export a static sites, consisting of
   - image showcase
   - upload page
 
@@ -36,11 +35,11 @@ This is a project to demo
 - TODO switch to jotai for client state
   - https://docs.astro.build/en/recipes/sharing-state-islands/
 
-## Demo projects
+## Demo services
 
 ### HttpCat
-- Demo where static contnet is stored under content 
-
+- Cat image for each HTTP status
+- Hybird of pre-existing upload and end-user upload
 
 ## Reference use cases
 
