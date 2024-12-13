@@ -15,6 +15,8 @@ export async function getStaticPaths() {
 	}));
 }
 
+export const prerender = true;
+
 const { code } = Astro.params;
 
 const httpcat = await getEntry("httpcat", code);

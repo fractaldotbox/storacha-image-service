@@ -51,10 +51,14 @@ export interface StorachaConfig {
 	spaceDid: W3DID;
 }
 
+export const getEnv = (key: string) => {
+	return import.meta.env[key] || process.env[key];
+};
+
 // TODO support other bundlers
 export const loadStorachaConfig = () => {
-	const keyString = process.env.VITE_STORACHA_KEY;
-	const proofString = process.env.VITE_STORACHA_PROOF;
+	const keyString = getEnv("VITE_STORACHA_KEY");
+	const proofString = getEnv("VITE_STORACHA_PROOF");
 	if (!keyString || !proofString) {
 		throw new Error("Missing VITE_STORACHA_KEY or VITE_STORACHA_PROOF");
 	}

@@ -15,11 +15,13 @@ import {
 
 import { initStorachaClient, loadStorachaConfig } from "@repo/content";
 
-const { keyString, proofString } = loadStorachaConfig();
+// const { keyString, proofString } = loadStorachaConfig();
+
+const runtime = Astro.locals.runtime;
 
 const { client, space } = await initStorachaClient({
-	keyString,
-	proofString,
+	keyString: runtime.VITE_STORACHA_KEY as string,
+	proofString: runtime.VITE_STORACHA_PROOF as string,
 });
 
 const httpcats = await getCollection("httpcat");
