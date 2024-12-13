@@ -9,7 +9,7 @@ Applying Generative AI is great but we need cost effective storage with fast (ca
 
 For best of both worlds, this is a micro CMS to 
 1. store assets on filecoin (via storacha), deploy static sites with API & optimized retrieval urls
-2.  elcome end-user to contribute in a decentralized way 
+2.  Welcome end-user to contribute in a decentralized way 
 
 serving as a demo for
 - storacha's UCAN supporting [Delegated upload flow](https://docs.storacha.network/concepts/architecture-options/#delegated)
