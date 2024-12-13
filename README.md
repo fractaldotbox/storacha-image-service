@@ -14,7 +14,10 @@ serving as a demo for
 - creating immutable trustless websites on IPFS/Filecoin
 
 ## Deployment targets
+- Render
+  - deployed with astro node adapter
 - Cloudflare pages
+  - *Currently facing build issue to share vite config to work for both client and astro ssr at cloudflare env
   - Opt for wrangler as we want to incorp multiple projects in this repo
   - use env variables on .env for auth
   - `env-cmd pnpm --filter cms deploy`

@@ -30,6 +30,7 @@ export default defineConfig({
 	adapter: node({
 		mode: 'standalone'
 	}),
+	site: import.meta.env.SITE_URL || 'https://storacha-image-service.onrender.com',
 	server: {
 		port: 4321,
 		host: "0.0.0.0"
