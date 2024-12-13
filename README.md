@@ -18,7 +18,7 @@ Websites often need flexible, performant image services for avatars, placeholder
 - **Storacha’s UCAN Delegated Upload Flow**: [Documentation](https://docs.storacha.network/concepts/architecture-options/#delegated)
 - **Immutable, Trustless Websites** on IPFS/Filecoin.
 
----
+
 
 ## 🚧 Deployment Targets
 
@@ -36,7 +36,6 @@ Websites often need flexible, performant image services for avatars, placeholder
 
 ### 3. **Fleek (TODO)**
 
----
 
 ## 📤 Uploading Content (Bootstrap)
 
@@ -47,7 +46,6 @@ We support dynamic content by decoupling the upload flow from site deployment. T
 env-cmd pnpm --filter content upload:httpcat
 ```
 
----
 
 ## 🏗️ Architecture
 
@@ -74,7 +72,7 @@ env-cmd pnpm --filter content upload:httpcat
 
 🔗 **Live Demo**: [HttpCat Demo](https://storacha-image-service.onrender.com/httpcat/)
 
----
+
 
 ## 🛠️ Reference Use Cases
 
@@ -86,7 +84,6 @@ env-cmd pnpm --filter content upload:httpcat
 ### Avatar Services
 - Avatars, status codes, and token-based image generation.
 
----
 
 ## 🙌 Acknowledgements
 
