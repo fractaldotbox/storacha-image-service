@@ -1,5 +1,7 @@
 # Storacha Image Service
 
+[Demo Video](https://bafybeifqd3546gsizaqzxuptlnbstugqi22qhhk57uam4has6ivfqtdlf4.ipfs.w3s.link/)
+
 # Motiviations
 
 Often we need performant and flexible image service at websites, from avatars to placeholders.
