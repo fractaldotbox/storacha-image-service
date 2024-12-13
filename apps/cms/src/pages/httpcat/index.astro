@@ -3,17 +3,13 @@ import { type CollectionEntry, getCollection } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
 
 import { SpaceInfoCard } from "@/components/SpaceInfoCard";
-import StorachaProvider from "@/components/StorachaProvider";
 import { Button } from "@/components/ui/button";
-import { getIpfsGatewayUrl } from "@/lib/gateway";
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from "../../components/ui/card";
 
+import { CatCard } from "@/components/CatCard";
+import CatCardsNew from "@/components/CatCardsNew.astro";
 import { initStorachaClient, loadStorachaConfig } from "@repo/content";
+
+export const prerender = true;
 
 const { keyString, proofString } = loadStorachaConfig();
 
@@ -25,10 +21,10 @@ const { client, space } = await initStorachaClient({
 const httpcats = await getCollection("httpcat");
 
 Astro.props.space = space;
+const catIds = httpcats.map(({ id }) => id);
 ---
 
 <Layout>
-    <StorachaProvider client:load>
     <div class="container">
         <h2 class="text-2xl font-bold">
             HTTP Cat
@@ -37,26 +33,19 @@ Astro.props.space = space;
         <div class="my-2 py-2">
             <a href="/httpcat/upload">
                 <Button variant="outline">
-                 Upload
+                Upload
                 </Button>
             </a>
-
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
-                <a href={`/httpcat/${data.id}`}>
-                  <Card className="bg-white p-4 rounded shadow">
-                        <CardHeader>
-                            <CardTitle className="text-xl font-semibold mb-2">{data.id}</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <img src={getIpfsGatewayUrl(data.imageSrc)} alt={`HTTP Cat ${data.id}`} class="w-full h-auto rounded" />
-                        </CardContent>
-                 </Card>
-                </a>
+                <CatCard id={data.id} imageSrc={data.imageSrc} />
             ))}
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <CatCardsNew existingIds={catIds} />
+        </div>
+
 
     </div>
-    </StorachaProvider>
 </Layout>
