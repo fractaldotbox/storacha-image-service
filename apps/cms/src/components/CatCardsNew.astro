@@ -1,0 +1,16 @@
+---
+
+import { type CollectionEntry, getCollection } from "astro:content";
+
+import { CatCard } from "@/components/CatCard";
+
+const httpcats = await getCollection(
+	"httpcat",
+	({ id }) => !Astro.props.existingIds.includes(id),
+);
+---
+<>
+    {httpcats.map(({data}:{data: CollectionEntry<'httpcat'>['data']}) => (
+        <CatCard id={data.id} imageSrc={data.imageSrc} />
+    ))}
+</>
