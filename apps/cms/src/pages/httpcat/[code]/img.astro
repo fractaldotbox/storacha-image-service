@@ -1,5 +1,8 @@
 ---
 import { getCollection, getEntry } from "astro:content";
+import { getIpfsGatewayUrl } from "@/lib/gateway";
+
+export const prerender = true;
 
 export async function getStaticPaths() {
 	const httpcats = await getCollection("httpcat");
@@ -11,7 +14,9 @@ export async function getStaticPaths() {
 	}));
 }
 
-return Astro.redirect(
-	"https://ipfs.io/ipfs/bafybeid35a5ep7rqpdjy2kqm5f2gveagn7e6gnegpolzw7mtmzul4qp4k4/100.jpg",
-);
+const { code } = Astro.params;
+
+const httpcat = await getEntry("httpcat", code);
+
+return Astro.redirect(getIpfsGatewayUrl(httpcat?.data?.imageSrc));
 ---
